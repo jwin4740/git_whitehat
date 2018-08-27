@@ -6,47 +6,31 @@ import com.gargoylesoftware.htmlunit.html.*;
 
 import java.math.BigDecimal;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
+        Configuration config = new Configuration();
+        HashMap<String, String> props = config.getProperties();
 
-        String searchQuery = "iphone 6s";
-        String baseUrl = "https://github.com/";
+        String repoDiv = props.get("repoDiv");
+        String baseUrl = props.get("baseUrl");
         WebClient client = new WebClient();
         client.getOptions().setCssEnabled(false);
         client.getOptions().setJavaScriptEnabled(false);
         try {
-            String searchUrl = baseUrl + "jwin4740?tab=repositories";
+            String searchUrl = baseUrl + "/jwin4740?page=1&tab=repositories";
             HtmlPage page = client.getPage(searchUrl);
-
-            DomNodeList h3 = page.getElementsByTagName("h3");
-
-
-            for (int i = 3; i < 13; i++) {
-                DomNode a = (DomNode) h3.get(i);
-                System.out.println(a.asXml());
+            HtmlElement ele = page.getHtmlElementById(repoDiv);
+            List<HtmlListItem> l = ele.getHtmlElementsByTagName("li");
+            HtmlAnchor j = (HtmlAnchor) l.get(0).getFirstChild().getFirstChild().getFirstChild();
+            System.out.println(j.getAttribute("href"));
+            for (HtmlListItem i : l) {
+                HtmlAnchor a = (HtmlAnchor) i.getFirstChild().getFirstChild().getFirstChild();
+                System.out.println(a.getAttribute("href"));
             }
-//                System.out.println(h3);
-//                for (HtmlElement htmlItem : items) {
-//                    HtmlAnchor itemAnchor = ((HtmlAnchor) htmlItem.getFirstByXPath(".//p[@class='result-info']/a"));
-//                    HtmlElement spanPrice = ((HtmlElement) htmlItem.getFirstByXPath(".//a/span[@class='result-price']"));
-//
-//                    // It is possible that an item doesn't have any price, we set the price to 0.0 in this case
-//                    String itemPrice = spanPrice == null ? "0.0" : spanPrice.asText();
-//
-//                    Item item = new Item();
-//                    item.setTitle(itemAnchor.asText());
-//                    item.setUrl(baseUrl + itemAnchor.getHrefAttribute());
-//
-//                    item.setPrice(new BigDecimal(itemPrice.replace("$", "")));
-//
-//
-//                    ObjectMapper mapper = new ObjectMapper();
-//                    String jsonString = mapper.writeValueAsString(item);
-//
-//                    System.out.println(jsonString);
-//                }
+
 
         } catch (
                 Exception e) {
